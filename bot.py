@@ -58,7 +58,7 @@ async def on_ready():
 
     print(guild.members)
 
-    await channel.send('RabbitBot has started')
+    #await channel.send('RabbitBot has started')
     ready = True
 
 
