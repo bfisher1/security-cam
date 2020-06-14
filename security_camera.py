@@ -86,7 +86,7 @@ def main():
             # compute the bounding box for the contour, draw it on the frame,
             # and update the text
             (x, y, w, h) = cv2.boundingRect(c)
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
+            #cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
             text = "There's a Visitor! :)"
             
         cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
@@ -151,7 +151,7 @@ def getMostRecentFile():
             fileNames.append(datetime.strptime(filePath.replace('.jpg', ''), '%Y-%m-%d %H:%M:%S.%f'))
         if len(fileNames) > 0:
             fileNames = sorted(fileNames)
-            return folder + '/' + str(fileNames[0]) + '.jpg'
+            return folder + '/' + str(fileNames[len(fileNames) - 1]) + '.jpg'
         return None
     else:
         return None

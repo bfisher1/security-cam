@@ -34,8 +34,10 @@ async def on_message(message):
         await message.channel.send(security_camera.LINK)
     
     elif message.content.lower() == 'get':
-        await message.channel.send(file=discord.File(security_camera.getMostRecentFile()))
-    # TODO: clear (different folders or all), get videos
+        mostRecentFile = security_camera.getMostRecentFile()
+        if mostRecentFile != None:
+            await message.channel.send(file=discord.File(mostRecentFile))
+    # TODO: clear (different folders or all), get videos, logs
 
 
 @client.event
@@ -46,7 +48,7 @@ async def on_ready():
             guild = g
 
     for c in guild.text_channels:
-        if c.name == 'general':
+        if c.name == secrets.CHANNEL:
             channel = c
 
     print(
