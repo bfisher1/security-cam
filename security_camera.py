@@ -25,7 +25,10 @@ DISPLAY = False
 
 LINK = secrets.LINK_WITHOUT_PASSWORD
 
+frame = None
+
 def main():
+    global frame
     print('Starting security camera')
     visitedCount = 0
     lastTimeVisitedCountCleared = datetime.now()
@@ -155,6 +158,10 @@ def getMostRecentFile():
         return None
     else:
         return None
+
+def getNow():
+    cv2.imwrite('now.jpg', frame)
+    return 'now.jpg'
 
 def compare(dir1):
     month1, day1, year1 = dir1.split('-')

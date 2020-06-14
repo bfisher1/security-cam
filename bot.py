@@ -30,13 +30,20 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.lower() == 'link':
+    if message.content.lower() == 'video':
         await message.channel.send(security_camera.LINK)
     
-    elif message.content.lower() == 'get':
+    if message.content.lower() == 'link':
+        await message.channel.send(security_camera.WEBSITE)
+
+    elif message.content.lower() == 'last':
         mostRecentFile = security_camera.getMostRecentFile()
         if mostRecentFile != None:
             await message.channel.send(file=discord.File(mostRecentFile))
+    elif message.content.lower() == 'now':
+        await message.channel.send(file=discord.File(security_camera.getNow()))
+    elif message.content.lower() == 'help':
+        message.channel.send(' video\n link\n last\n now')
     # TODO: clear (different folders or all), get videos, logs
 
 
