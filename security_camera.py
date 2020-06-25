@@ -25,10 +25,8 @@ DISPLAY = False
 
 LINK = secrets.LINK_WITHOUT_PASSWORD
 
-frame = None
-
 def main():
-    global frame
+    frame = None
     print('Starting security camera')
     visitedCount = 0
     lastTimeVisitedCountCleared = datetime.now()
@@ -36,6 +34,9 @@ def main():
     visitorMostRecentlySeen = None
     lastTimeBackgroundReset = datetime.now()
     savingVisitorImage = datetime.now()
+    frames = []
+    savingVideoFrames = False
+    savingVideo = False
 
 
     vs = cv2.VideoCapture(secrets.LINK_WITH_PASSWORD)
@@ -56,6 +57,13 @@ def main():
             visitorFirstArrived = None
             visitorMostRecentlySeen = None
             emailedAboutVisitor = False
+            if savingVideo:
+                now = datetime.now()
+                folder = str(now.month) + '-' + str(now.day) + '-' + str(now.year)
+                saveVideo(folder + '/' + str(datetime.now()), frames)
+                savingVideo = False
+            savingVideoFrames = False
+            frames = []
 
 
         text = "No one's here :("
@@ -96,6 +104,7 @@ def main():
             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         
         if foundVisitor:
+            savingVideoFrames = True
             lastTimeVisitedCountCleared = datetime.now()
             visitedCount += 1
             if visitorFirstArrived == None:
@@ -122,9 +131,11 @@ def main():
 
                 msg = 'There\'s an animal at the door!\n'
 
-                if bot.ready:
-                    bot.send("There\'s an animal at the door!")
-                    bot.sendFile(getMostRecentFile())
+                #if bot.ready:
+                #    bot.send("There\'s an animal at the door!")
+                #    bot.sendFile(getMostRecentImage())
+                
+                savingVideo = True
 
         if DISPLAY:
             cv2.imshow("Security Feed", frame)
@@ -136,11 +147,25 @@ def main():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
+        if savingVideoFrames:
+            frames.append(frame)
+
     vs.release()
     cv2.destroyAllWindows()
     exit()
 
-def getMostRecentFile():
+def getVideosFromToday():
+    now = datetime.now()
+    folder = str(now.month) + '-' + str(now.day) + '-' + str(now.year)
+    videoFiles = []
+    if os.path.isdir(folder):
+        for filePath in os.listdir(folder):
+            if filePath.endswith('.mkv'):
+                videoFiles.append(folder + '/' + filePath)
+        videoFiles = sorted(videoFiles, key=os.path.getmtime)
+    return videoFiles
+
+def getMostRecentImage():
     paths = []
     for path in os.listdir():
         if os.path.isdir(path) and path.count('-') == 2:
@@ -167,4 +192,27 @@ def compare(dir1):
     month1, day1, year1 = dir1.split('-')
     return year1 + month1 + day1
     
+def saveVideo(filename, frames):
+    height, width, _ = frames[0].shape
+    print('saving video now', len(frames), width, height)
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+
+    duplicateNum = 0
+    video = cv2.VideoWriter(filename + '.mkv', fourcc, 20.0, (width,height))
+    videoWritten = False
+
+    # save every 200 frames to its own file
+    for i in range(len(frames)):
+        video.write(frames[i])
+        videoWritten = True
+        if i % 200 == 0 and i != 0:
+            video.release()
+            video = cv2.VideoWriter(filename + '-' + str(duplicateNum) + '.mkv', fourcc, 20.0, (width,height))
+            duplicateNum += 1
+            videoWritten = False
+
+    if videoWritten:
+        video.release()
+
+
 threading.Thread(target=main).start()
