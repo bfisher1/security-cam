@@ -23,6 +23,8 @@ EMAIL_ENABLED = True
 SECONDS_TO_SAVE_VISITOR_IMAGES = 1
 DISPLAY = False
 
+TOP_CROP = 0#135
+
 LINK = secrets.LINK_WITHOUT_PASSWORD
 
 frame = None
@@ -61,6 +63,7 @@ def main():
         text = "No one's here :("
         ret, frame = vs.read()
         frame = cv2.resize(frame,None,fx=.4,fy=.4)
+        frame = frame[TOP_CROP:len(frame), 0:len(frame[0])]
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
@@ -147,6 +150,7 @@ def getMostRecentFile():
             paths.append(path)
         print('Path is ', paths)
     paths = sorted(paths, key=compare)
+    paths.reverse()
     fileNames = []
     if len(paths) > 0:
         folder = paths[0]
