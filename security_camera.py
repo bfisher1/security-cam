@@ -134,9 +134,9 @@ def main():
 
                 msg = 'There\'s an animal at the door!\n'
 
-                #if bot.ready:
-                #    bot.send("There\'s an animal at the door!")
-                #    bot.sendFile(getMostRecentImage())
+                if bot.ready:
+                    bot.send("There\'s an animal at the door!")
+                    bot.sendFile(getMostRecentImage())
                 
                 savingVideo = True
 
